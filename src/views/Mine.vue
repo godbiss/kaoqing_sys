@@ -34,7 +34,7 @@ export default {
             },
             {
                 oname: "选择班级",
-                push:""
+                push:"/stdHome/interBanji"
             },
         ]
       }

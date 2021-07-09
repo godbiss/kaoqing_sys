@@ -27,7 +27,7 @@ export default {
 
 <style scoped> 
 .el-main {
-  height: 80vh;
+  height: 78vh;
 }
 
 </style>

@@ -6,10 +6,11 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : {
-      userid: 0,
+      id: 0,
+      codenum: '',
       email: '',
       username: '',
-      usertype: 0
+      role: 0
     },
     errorMsg: "",
     token: localStorage.getItem('token') ? localStorage.getItem('token') : '',   // token

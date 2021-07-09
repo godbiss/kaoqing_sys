@@ -21,14 +21,15 @@ Vue.prototype.$axios = axios
 // 全局路由构造函数，判断是否登录和要跳转到页面
 router.beforeEach((to, from, next) => {
   if(to.matched.some(m => m.meta.requirePhone)){
-    if(!sysTool._isMobile()){
-      store.state.errorMsg = "请使用手机登录"
-      next({path: '/errorMsg'})
-    }else{
-      next()
-    }
-    
-  }
+      if(!sysTool._isMobile()){
+        store.state.errorMsg = "请使用手机登录"
+        next({path: '/errorMsg'})
+      }else{
+        next()
+      }
+  }    
+
+
   if (to.matched.some(m => m.meta.requireAuth)) {    // 需要登录
     if(window.localStorage.token){
       next()

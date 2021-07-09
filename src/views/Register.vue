@@ -11,8 +11,14 @@
           :rules="rules"
         >
           <el-form-item> 注册 </el-form-item>
+          <el-form-item label="学号" prop="codenum">
+            <el-input v-model="registForm.codenum"></el-input>
+          </el-form-item>
           <el-form-item label="邮箱" prop="email">
             <el-input v-model="registForm.email"></el-input>
+          </el-form-item>
+          <el-form-item label="宿舍" prop="room">
+            <el-input v-model="registForm.room"></el-input>
           </el-form-item>
           <el-form-item label="用户名" prop="username">
             <el-input v-model="registForm.username"></el-input>
@@ -31,8 +37,8 @@
               autocomplete="off"
             ></el-input>
           </el-form-item>
-          <el-form-item label="类型" prop="type"
-            ><el-select v-model="registForm.type" placeholder="请选择">
+          <el-form-item label="类型" prop="role"
+            ><el-select v-model="registForm.role" placeholder="请选择">
               <el-option
                 v-for="item in options"
                 :key="item.value"
@@ -90,16 +96,25 @@ export default {
     return {
       labelPosition: "right",
       registForm: {
+        codenum: '',
         email: "",
+        room: "",
         username: "",
         password: "",
         checkPass: "",
-        type: "",
+        role: "",
       },
       rules: {
+        codenum: [
+          {required: true, message: "请输入学号", trigger: "blur"},
+          { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
+        ],
         email: [
          { required: true, message: '请输入邮箱地址', trigger: 'blur' },
           { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
+        ],
+        room: [
+          {required: true, message: "请输入宿舍", trigger: 'blur'}
         ],
         username: [
           { required: true, validator: validateUsername, trigger: "blur" },
@@ -130,10 +145,12 @@ export default {
         if (valid) {
           this.$axios
             .put("/api/regist", {
+              codenum: this.registForm.codenum,
               email : this.registForm.email,
               username: this.registForm.username,
               password: this.registForm.password,
-              type: this.registForm.type,
+              room: this.registForm.room,
+              role: this.registForm.role,
             })
             .then((res) => {
               console.log(res);
@@ -164,10 +181,10 @@ export default {
     },
   },
   created() {
-    if (!sysTool._isMobile()) {
-      this.$store.commit("setErrorMsg", "请使用手机登录!");
-      this.$router.push({ name: "ErrorMsg" });
-    }
+    // if (!sysTool._isMobile()) {
+    //   this.$store.commit("setErrorMsg", "请使用手机登录!");
+    //   this.$router.push({ name: "ErrorMsg" });
+    // }
   },
 };
 </script>

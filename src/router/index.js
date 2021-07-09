@@ -6,6 +6,11 @@ import ErrorMsg from '@/views/ErrorMsg'
 import Register from '@/views/Register'
 import Mine from '@/views/Mine'
 import StdHomePage from '@/views/StdHomePage'
+import CourseTable from '@/views/CourseTable'
+import THome from '@/views/THome'
+import TMine from '@/views/TMine'
+import TinterBanji from '@/views/TinterBanji'
+import InterBanji from '@/views/InterBanji'
 
 Vue.use(Router)
 
@@ -44,7 +49,13 @@ export default new Router({
         {
           path:'/stdHome/stdHomePage',
           name:'StdHomePage',
-          component:StdHomePage
+          component:StdHomePage,
+        },
+        { path:'/stdHome/interBanji', name:'InterBanji', component:InterBanji },
+        {
+          path:'/stdHome/courseTable',
+          name:'CourseTable',
+          component:CourseTable
         },
         {
           path:'/stdHome/mine',
@@ -56,6 +67,19 @@ export default new Router({
         requireAuth : true,
         requirePhone : true
       }
+    },
+    {
+      path:'/tHome',
+      name:"THome",
+      component:THome,
+      children:[
+        { path:'/tHome/tinterBanji', name:'TinterBanji', component:TinterBanji},
+        {
+          path:'/tHome/tMine',
+          name:'TMine',
+          component:TMine
+        }
+      ]
     },
     {
       path:'/register',

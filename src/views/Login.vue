@@ -12,8 +12,8 @@
           hide-required-asterisk
         >
           <el-form-item> 登录 </el-form-item>
-          <el-form-item label="账号" prop="email">
-            <el-input v-model="loginForm.email" placeholder="邮箱"></el-input>
+          <el-form-item label="账号" prop="codenum">
+            <el-input v-model="loginForm.codenum" placeholder="学号或教工号"></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="password">
             <el-input v-model="loginForm.password" show-password></el-input>
@@ -29,24 +29,19 @@
 </template>
 
 <script>
-import * as cookieTool from '../utils/cookieTool'
 export default {
   name: "Login",
   data() {
     return {
       labelPosition: "right",
       loginForm: {
-        email: "",
+        codenum: "",
         password: "",
       },
       rules: {
-        email: [
-          { required: true, message: "请输入邮箱地址", trigger: "blur" },
-          {
-            type: "email",
-            message: "请输入正确的邮箱地址",
-            trigger: ["blur", "change"],
-          },
+        codenum: [
+          { required: true, message: "请输入学号或教工号", trigger: "blur" },
+          
         ],
         password: [
           { required: true, message: "请输入密码", trigger: "blur" },
@@ -58,16 +53,21 @@ export default {
     login() {
       this.$axios
         .post("/api/login", {
-          email: this.loginForm.email,
+          codenum: this.loginForm.codenum,
           password: this.loginForm.password,
         })
         .then((res) => {
           if (res.status == 200 && res.data.success) {
             console.log(res.data);
-            this.$store.commit('$_setToken', res.data.token);
-            this.$store.commit('$_setUser', res.data.user);
-            this.$toast("登录成功")
-            this.$router.push({ name:'StdHomePage' })  // 跳转到首页
+              this.$store.commit('$_setToken', res.data.token);
+              this.$store.commit('$_setUser', res.data.user);
+              this.$toast("登录成功")
+            if(res.data.user.role === 2){
+              this.$router.push({ name:'StdHomePage' })  // 跳转到首页
+            }else if(res.data.user.role === 3){
+              this.$router.push({ name:'THome' })  // 跳转到首页
+            }
+            
           } else {
             this.$toast("登录失败");
           }
