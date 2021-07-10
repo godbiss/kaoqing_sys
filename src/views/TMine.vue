@@ -1,5 +1,6 @@
 <template>
     <div class="container">
+        <el-button type="infor" @click="$router.push({name:'Tkaoqin'})">考勤情况</el-button>
         <el-button type="infor" @click="$router.push({name:'TinterBanji'})">加入班级</el-button>
         <el-button type="danger" @click="dialogVisible = true">退出登录</el-button>
 

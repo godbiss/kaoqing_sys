@@ -8,8 +8,12 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import store from './store'
 import { Toast, Dialog } from 'vant'
+import { Loading } from 'vant';
+
+
 import * as sysTool from "./utils/systemTool.js";
 
+Vue.use(Loading);
 Vue.use(Dialog)
 Vue.use(Toast)
 Vue.use(ElementUI);

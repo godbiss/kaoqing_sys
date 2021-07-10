@@ -11,6 +11,7 @@ import THome from '@/views/THome'
 import TMine from '@/views/TMine'
 import TinterBanji from '@/views/TinterBanji'
 import InterBanji from '@/views/InterBanji'
+import Tkaoqin from '@/views/Tkaoqin'
 
 Vue.use(Router)
 
@@ -61,7 +62,7 @@ export default new Router({
           path:'/stdHome/mine',
           name:'Mine',
           component:Mine
-        }
+        },
       ],
       meta: {
         requireAuth : true,
@@ -74,6 +75,7 @@ export default new Router({
       component:THome,
       children:[
         { path:'/tHome/tinterBanji', name:'TinterBanji', component:TinterBanji},
+        { path:'/tHome/tkaoqin', name:'Tkaoqin', component:Tkaoqin},
         {
           path:'/tHome/tMine',
           name:'TMine',

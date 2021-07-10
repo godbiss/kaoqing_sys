@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    
+
 
     <Bottom-Nav :idx="0"></Bottom-Nav>
   </div>
@@ -8,9 +8,12 @@
 
 <script>
 import BottomNav from "../components/BottomNav";
+
 export default {
   name: "StdHomePage",
-  components: { BottomNav },
+  components: { 
+    BottomNav,
+   },
 };
 </script>
 
