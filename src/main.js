@@ -9,7 +9,7 @@ import 'element-ui/lib/theme-chalk/index.css';
 import store from './store'
 import { Toast, Dialog } from 'vant'
 import { Loading } from 'vant';
-
+import WS from './utils/websocket.js'
 
 import * as sysTool from "./utils/systemTool.js";
 
@@ -18,8 +18,10 @@ Vue.use(Dialog)
 Vue.use(Toast)
 Vue.use(ElementUI);
 
+
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
+Vue.prototype.$ws = WS.createWS()
 
 
 // 全局路由构造函数，判断是否登录和要跳转到页面
@@ -90,5 +92,5 @@ new Vue({
   router,
   components: { App },
   template: '<App/>',
-  store
+  store,
 })

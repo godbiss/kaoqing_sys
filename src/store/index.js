@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
   state: {
     user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : {
       id: 0,
@@ -14,6 +14,7 @@ export default new Vuex.Store({
     },
     errorMsg: "",
     token: localStorage.getItem('token') ? localStorage.getItem('token') : '',   // token
+    webSocketMsg:'',
   },
   getters: {    // 监听数据变化的
     getStorage(state) {   // 获取本地存储的登录信息
@@ -24,6 +25,9 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    SET_WS_MSG (state, msg){
+      state.webSocketMsg = msg
+    },
     setErrorMsg(state, msg) {
       state.errorMsg = msg
     },
@@ -44,3 +48,5 @@ export default new Vuex.Store({
     },
   }
 })
+
+export default store
