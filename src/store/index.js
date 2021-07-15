@@ -15,6 +15,7 @@ const store = new Vuex.Store({
     errorMsg: "",
     token: localStorage.getItem('token') ? localStorage.getItem('token') : '',   // token
     webSocketMsg:'',
+    webSocket: null,
   },
   getters: {    // 监听数据变化的
     getStorage(state) {   // 获取本地存储的登录信息

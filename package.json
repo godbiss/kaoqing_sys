@@ -5,7 +5,7 @@
   "author": "zhy <441948700@qq.com>",
   "private": true,
   "scripts": {
-    "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
+    "dev": "webpack-dev-server --disableHostCheck=true --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
     "build": "node build/build.js"
   },
@@ -19,6 +19,7 @@
     "vuex": "^3.6.2"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.171",
     "autoprefixer": "^7.1.2",
     "babel-core": "^6.22.1",
     "babel-helper-vue-jsx-merge-props": "^2.0.3",

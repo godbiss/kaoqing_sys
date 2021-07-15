@@ -16,10 +16,6 @@
       prop="banji">
     </el-table-column>
     <el-table-column
-      label="状态"
-      prop="zhuangtai">
-    </el-table-column>
-    <el-table-column
       align="right">
       <template slot="header" slot-scope="scope">
         <el-input
@@ -31,10 +27,18 @@
         <el-button
           size="mini"
           @click="handleEdit(scope.$index, scope.row)">考勤情况</el-button>
-        <el-button
-          size="mini"
-          type="primary"
-          @click="handleDelete(scope.$index, scope.row)">发起考勤</el-button>
+          <div v-if="scope.row.kechenglock === 1">
+            <el-button
+            size="mini"
+            type="primary"
+            @click="handleDelete(scope.$index, scope.row)">开始上课</el-button>
+          </div>
+          <div v-else>
+            <el-button
+            size="mini"
+            type="danger"
+            @click="handleDelete(scope.$index, scope.row)">马上下课</el-button>
+          </div>
       </template>
     </el-table-column>
   </el-table>
@@ -60,9 +64,20 @@
       prop="banjiname">
     </el-table-column>
     <el-table-column
-      label="状态"
-      prop="isKuangke">
+      label="状态">
+    <template slot-scope="scope">
+      <div v-if="scope.row.isKuangke === 1" style="color: #F56C6C">
+        旷课
+      </div>
+      <div v-else-if="scope.row.isKuangke === 0" style="color: #67C23A">
+        已到课
+      </div>
+      <div v-else-if="scope.row.isKuangke === 2" style="color: #909399">
+        未签到
+      </div>
+    </template>
     </el-table-column>
+    
       <el-table-column
       label="旷课次数"
       prop="kuangkenum">
@@ -78,15 +93,26 @@
       <template slot-scope="scope">
         <el-button
           size="mini"
-          @click="handleEdit(scope.$index, scope.row)">考勤情况</el-button>
+          @click="handleZhuangtai(scope.$index, scope.row)">修改状态</el-button>
         <el-button
           size="mini"
           type="primary"
-          @click="handleDelete(scope.$index, scope.row)">提醒签到</el-button>
+          @click="handleTixin(scope.$index, scope.row)">提醒签到</el-button>
       </template>
     </el-table-column>
   </el-table>
   </el-dialog>
+
+  <el-dialog
+  title="选择签到方式"
+  :visible.sync="dialogVisible3"
+  width="30%"
+  :before-close="handleQiandaoClose">
+  <span>这是一段信息</span>
+  <span slot="footer" class="dialog-footer">
+    
+  </span>
+</el-dialog>
 </div>
     
 </template>
@@ -99,19 +125,26 @@ export default {
  data() {
       return {
         dialogVisible: false,
+        dialogVisible3: false,
         tableData: [],
         tableData2: [],
         search: '',
+        dialogbanjinum:null,
+        dialogkechengname:null,
+        dialogriqi:null,
       }
     },
     methods: {
       handleEdit(index, row) {
         console.log(index, row);
+        this.dialogbanjinum = row.banjinum
+        this.dialogkechengname = row.kechengname,
+        this.dialogriqi = row.shangketime.split(" ")[0]
         this.$axios.get('/api/kaoqinlog/teacher/list', {
           params: {
             banjinum: row.banjinum,
             kechengname: row.kechengname,
-            riqi: "",
+            riqi: row.shangketime.split(" ")[0],
             teacher: this.$store.state.user.codenum
           }
         })
@@ -127,14 +160,76 @@ export default {
       },
       handleDelete(index, row) {
         console.log(index, row);
+
+        if(row.kechenglock === 1){
+          dialogVisible3 = true
+        }
+        
+        this.$axios.post("/api/kaoqinlog/teacher/update/kechenglock", {
+          banjinum: row.banjinum,
+          kechengname: row.kechengname,
+          riqi: row.shangketime.split(" ")[0],
+          kechenglock: row.kechenglock === 1 ? 0 : 1
+        }).then(res => {
+          console.log(res)
+
+          //重新渲染
+          this.getTeacherList()
+        }).catch(err => {
+          console.log(err)
+        })
       },
       handleClose(done) {
+        this.dialogbanjinum = null
+        this.dialogkechengname = null
+        this.dialogriqi = null
         done()
       },
+      handleZhuangtai(index, row){
+        console.log(index, row);
+        //修改状态与旷课数
+        this.$axios.post("/api/kaoqinlog/teacher/update", {
+          id: row.kaoqinlogid,
+          kechengname: this.dialogkechengname,
+          codenum: row.codenum,
+          isKuangke: row.isKuangke === 0 ? 1 : 0,
+          kuangkenum: row.kuangkenum
+        }).then(res => {
+          console.log(res)
+          if(res.data.success === true){
+            this.$message("修改成功")
 
-    },
-    created() {
-      console.log('created')
+            //列表重新渲染
+            this.$axios.get('/api/kaoqinlog/teacher/list', {
+              params: {
+                banjinum: this.dialogbanjinum,
+                kechengname: this.dialogkechengname,
+                riqi: this.dialogriqi,
+                teacher: this.$store.state.user.codenum
+              }
+            })
+            .then(res => {
+              console.log(res)
+              this.tableData2 = res.data
+            })
+            .catch(err => {
+              console.log(err)
+            })
+          }else{
+            this.$message("修改失败")
+          }
+        }).catch(err => {
+          console.log(err)
+        })
+
+      },
+      handleTixin(index, row){
+        console.log(index, row);
+      },
+      handleQiandaoClose(done){
+        done()
+      },
+      getTeacherList(){
         this.$axios.get('/api/kecheng/teacher/'+this.$store.state.user.codenum)
         .then(res => {
             console.log(res)
@@ -147,17 +242,16 @@ export default {
                   start.setHours(8)
                   start.setMinutes(0)
                   start.setSeconds(0)
-                  start.setHours(9)
-                  start.setMinutes(50)
-                  start.setSeconds(0)
+                  end.setHours(9)
+                  end.setMinutes(50)
+                  end.setSeconds(0)
                   
+                  //根据日期修改课程状态
                   var now = new Date();
                   if( now.getFullYear() == start.getFullYear() && now.getMonth() == start.getMonth() && now.getDate() == start.getDate() ){
-                    if(now.getHours() >= start.getHours() && now.getHours() <= end.getHours() && now.getMinutes() >= start.getMinutes() && now.getMinutes() <= end.getMinutes() 
-                      && now.getSeconds() >= start.getMinutes() && now.getSeconds <= end.getSeconds()){
+                    if(now >= start && now <= end){
                         element.zhuangtai = "正在上课"
-                    }else if(now.getHours() >= start.getHours() && now.getHours() >= end.getHours() && now.getMinutes() >= start.getMinutes() && now.getMinutes() >= end.getMinutes() 
-                      && now.getSeconds() >= start.getMinutes() && now.getSeconds >= end.getSeconds()){
+                    }else if(now > end){
                         element.zhuangtai = "已下课"
                       }
                   }else if( now.getFullYear() < start.getFullYear() || now.getMonth() < start.getMonth() || now.getDate() < start.getDate() ){
@@ -173,20 +267,18 @@ export default {
                 if(element.kechengname2 != null){
                   var start = shangketimetemp
                   var end = shangketimetemp
-                  start.setHours(8)
-                  start.setMinutes(0)
+                  start.setHours(10)
+                  start.setMinutes(10)
                   start.setSeconds(0)
-                  start.setHours(9)
-                  start.setMinutes(50)
-                  start.setSeconds(0)
+                  end.setHours(12)
+                  end.setMinutes(0)
+                  end.setSeconds(0)
                   
                   var now = new Date();
                   if( now.getFullYear() == start.getFullYear() && now.getMonth() == start.getMonth() && now.getDate() == start.getDate() ){
-                    if(now.getHours() >= start.getHours() && now.getHours() <= end.getHours() && now.getMinutes() >= start.getMinutes() && now.getMinutes() <= end.getMinutes() 
-                      && now.getSeconds() >= start.getMinutes() && now.getSeconds <= end.getSeconds()){
+                    if(now >= start && now <= end){
                         element.zhuangtai = "正在上课"
-                    }else if(now.getHours() >= start.getHours() && now.getHours() >= end.getHours() && now.getMinutes() >= start.getMinutes() && now.getMinutes() >= end.getMinutes() 
-                      && now.getSeconds() >= start.getMinutes() && now.getSeconds >= end.getSeconds()){
+                    }else if(now > end){
                         element.zhuangtai = "已下课"
                       }
                   }else if( now.getFullYear() < start.getFullYear() || now.getMonth() < start.getMonth() || now.getDate() < start.getDate() ){
@@ -202,20 +294,18 @@ export default {
                 if(element.kechengname3 != null){
                                     var start = shangketimetemp
                   var end = shangketimetemp
-                  start.setHours(8)
-                  start.setMinutes(0)
+                  start.setHours(14)
+                  start.setMinutes(30)
                   start.setSeconds(0)
-                  start.setHours(9)
-                  start.setMinutes(50)
-                  start.setSeconds(0)
+                  end.setHours(16)
+                  end.setMinutes(20)
+                  end.setSeconds(0)
                   
                   var now = new Date();
                   if( now.getFullYear() == start.getFullYear() && now.getMonth() == start.getMonth() && now.getDate() == start.getDate() ){
-                    if(now.getHours() >= start.getHours() && now.getHours() <= end.getHours() && now.getMinutes() >= start.getMinutes() && now.getMinutes() <= end.getMinutes() 
-                      && now.getSeconds() >= start.getMinutes() && now.getSeconds <= end.getSeconds()){
+                    if(now >= start && now <= end){
                         element.zhuangtai = "正在上课"
-                    }else if(now.getHours() >= start.getHours() && now.getHours() >= end.getHours() && now.getMinutes() >= start.getMinutes() && now.getMinutes() >= end.getMinutes() 
-                      && now.getSeconds() >= start.getMinutes() && now.getSeconds >= end.getSeconds()){
+                    }else if(now > end){
                         element.zhuangtai = "已下课"
                       }
                   }else if( now.getFullYear() < start.getFullYear() || now.getMonth() < start.getMonth() || now.getDate() < start.getDate() ){
@@ -229,20 +319,18 @@ export default {
                 if(element.kechengname4 != null){
                                     var start = shangketimetemp
                   var end = shangketimetemp
-                  start.setHours(8)
-                  start.setMinutes(0)
+                  start.setHours(16)
+                  start.setMinutes(30)
                   start.setSeconds(0)
-                  start.setHours(9)
-                  start.setMinutes(50)
-                  start.setSeconds(0)
+                  end.setHours(18)
+                  end.setMinutes(10)
+                  end.setSeconds(0)
                   
                   var now = new Date();
                   if( now.getFullYear() == start.getFullYear() && now.getMonth() == start.getMonth() && now.getDate() == start.getDate() ){
-                    if(now.getHours() >= start.getHours() && now.getHours() <= end.getHours() && now.getMinutes() >= start.getMinutes() && now.getMinutes() <= end.getMinutes() 
-                      && now.getSeconds() >= start.getMinutes() && now.getSeconds <= end.getSeconds()){
+                    if(now >= start && now <= end){
                         element.zhuangtai = "正在上课"
-                    }else if(now.getHours() >= start.getHours() && now.getHours() >= end.getHours() && now.getMinutes() >= start.getMinutes() && now.getMinutes() >= end.getMinutes() 
-                      && now.getSeconds() >= start.getMinutes() && now.getSeconds >= end.getSeconds()){
+                    }else if(now > end){
                         element.zhuangtai = "已下课"
                       }
                   }else if( now.getFullYear() < start.getFullYear() || now.getMonth() < start.getMonth() || now.getDate() < start.getDate() ){
@@ -256,20 +344,18 @@ export default {
                 if(element.kechengname5 != null){
                                     var start = shangketimetemp
                   var end = shangketimetemp
-                  start.setHours(8)
+                  start.setHours(19)
                   start.setMinutes(0)
                   start.setSeconds(0)
-                  start.setHours(9)
-                  start.setMinutes(50)
-                  start.setSeconds(0)
+                  end.setHours(20)
+                  end.setMinutes(0)
+                  end.setSeconds(0)
                   
                   var now = new Date();
                   if( now.getFullYear() == start.getFullYear() && now.getMonth() == start.getMonth() && now.getDate() == start.getDate() ){
-                    if(now.getHours() >= start.getHours() && now.getHours() <= end.getHours() && now.getMinutes() >= start.getMinutes() && now.getMinutes() <= end.getMinutes() 
-                      && now.getSeconds() >= start.getMinutes() && now.getSeconds <= end.getSeconds()){
+                     if(now >= start && now <= end){
                         element.zhuangtai = "正在上课"
-                    }else if(now.getHours() >= start.getHours() && now.getHours() >= end.getHours() && now.getMinutes() >= start.getMinutes() && now.getMinutes() >= end.getMinutes() 
-                      && now.getSeconds() >= start.getMinutes() && now.getSeconds >= end.getSeconds()){
+                    }else if(now > end){
                         element.zhuangtai = "已下课"
                       }
                   }else if( now.getFullYear() < start.getFullYear() || now.getMonth() < start.getMonth() || now.getDate() < start.getDate() ){
@@ -278,7 +364,32 @@ export default {
                     element.zhuangtai = "已下课"
                   }
                   element.shangketime = "" + shangketimetemp.getFullYear() + "-" + (shangketimetemp.getMonth()+1) + "-" + shangketimetemp.getDate() + " 19:00~21:00"
-                  element.kechengname = element.kechengname4
+                  element.kechengname = element.kechengname5
+                }
+                if(element.kechengname6 != null){
+                  var start = shangketimetemp
+                  var end = shangketimetemp
+                  start.setHours(20)
+                  start.setMinutes(0)
+                  start.setSeconds(0)
+                  end.setHours(21)
+                  end.setMinutes(0)
+                  end.setSeconds(0)
+                  
+                  var now = new Date();
+                  if( now.getFullYear() == start.getFullYear() && now.getMonth() == start.getMonth() && now.getDate() == start.getDate() ){
+                    if(now >= start && now <= end){
+                        element.zhuangtai = "正在上课"
+                    }else if(now > end){
+                        element.zhuangtai = "已下课"
+                      }
+                  }else if( now.getFullYear() < start.getFullYear() || now.getMonth() < start.getMonth() || now.getDate() < start.getDate() ){
+                    element.zhuangtai = "未上课"
+                  }else if( now.getFullYear() > start.getFullYear() || now.getMonth() > start.getMonth() || now.getDate() > start.getDate() ){
+                    element.zhuangtai = "已下课"
+                  }
+                  element.shangketime = "" + shangketimetemp.getFullYear() + "-" + (shangketimetemp.getMonth()+1) + "-" + shangketimetemp.getDate() + " 19:00~21:00"
+                  element.kechengname = element.kechengname6
                 }
 
             });
@@ -286,6 +397,11 @@ export default {
         .catch(err => {
             console.log(err)
         })
+      }
+
+    },
+    created() {
+        this.getTeacherList()
     },
 }
 </script>

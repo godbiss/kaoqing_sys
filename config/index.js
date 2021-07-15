@@ -10,6 +10,7 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
+    //添加代理
     proxyTable: {
       '/api' : {
         target:'http://localhost:80/kaoqin_sys',

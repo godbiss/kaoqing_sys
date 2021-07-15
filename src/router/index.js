@@ -12,6 +12,12 @@ import TMine from '@/views/TMine'
 import TinterBanji from '@/views/TinterBanji'
 import InterBanji from '@/views/InterBanji'
 import Tkaoqin from '@/views/Tkaoqin'
+import AHome from "@/views/AHome"
+import AMine from "@/views/AMine"
+import Akebiao from "@/views/Akebiao"
+import Qiandao from '@/views/Qiandao'
+import QiandaoPanel from "@/views/QiandaoPanel"
+import Qingjia from "@/views/Qingjia"
 
 Vue.use(Router)
 
@@ -63,12 +69,15 @@ export default new Router({
           name:'Mine',
           component:Mine
         },
+        { path:'/stdHome/qiandao', name:'Qiandao', component:Qiandao},
+        { path:'/stdHome/qiandaoPanel', name:'QiandaoPanel', component:QiandaoPanel},
       ],
       meta: {
         requireAuth : true,
         requirePhone : true
       }
     },
+    { path:'/std/qingjia', name:"Qingjia", component:Qingjia },
     {
       path:'/tHome',
       name:"THome",
@@ -81,6 +90,15 @@ export default new Router({
           name:'TMine',
           component:TMine
         }
+      ]
+    },
+    {
+      path:'/aHome',
+      name:'AHome',
+      component:AHome,
+      children:[
+        { path:'/aHome/aMine', name:'AMine', component:AMine},
+        { path:'/aHome/akebiao', name:'Akebiao', component:Akebiao},
       ]
     },
     {

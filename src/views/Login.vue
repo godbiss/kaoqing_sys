@@ -66,6 +66,8 @@ export default {
               this.$router.push({ name:'StdHomePage' })  // 跳转到首页
             }else if(res.data.user.role === 3){
               this.$router.push({ name:'THome' })  // 跳转到首页
+            }else{
+              this.$router.push({ name:'AHome' })  // 跳转到首页
             }
             
           } else {

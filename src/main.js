@@ -7,12 +7,29 @@ import axios from 'axios'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import store from './store'
-import { Toast, Dialog } from 'vant'
+import { Toast, Dialog, List } from 'vant'
 import { Loading } from 'vant';
-import WS from './utils/websocket.js'
+import { Cell, CellGroup } from 'vant';
+import { Panel } from 'vant';
+import { PullRefresh } from 'vant';
+import { DatetimePicker } from 'vant';
+import { ActionSheet, Popup } from 'vant';
+import { Field } from 'vant';
+import { Button } from 'vant';
 
 import * as sysTool from "./utils/systemTool.js";
 
+
+Vue.use(Button);
+Vue.use(Field);
+Vue.use(Popup);
+Vue.use(ActionSheet);
+Vue.use(DatetimePicker);
+Vue.use(PullRefresh);
+Vue.use(Panel);
+Vue.use(Cell);
+Vue.use(CellGroup);
+Vue.use(List);
 Vue.use(Loading);
 Vue.use(Dialog)
 Vue.use(Toast)
@@ -21,7 +38,6 @@ Vue.use(ElementUI);
 
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
-Vue.prototype.$ws = WS.createWS()
 
 
 // 全局路由构造函数，判断是否登录和要跳转到页面
