@@ -16,10 +16,11 @@ import { DatetimePicker } from 'vant';
 import { ActionSheet, Popup } from 'vant';
 import { Field } from 'vant';
 import { Button } from 'vant';
+import { Overlay } from 'vant';
 
 import * as sysTool from "./utils/systemTool.js";
 
-
+Vue.use(Overlay);
 Vue.use(Button);
 Vue.use(Field);
 Vue.use(Popup);

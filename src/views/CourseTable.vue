@@ -186,11 +186,8 @@ export default {
 
 </script>
 
-<style scoped>
+<style>
     .highlight-week{
         color: #409EFF;
-        background-color: #000;
     }
-
-
 </style>

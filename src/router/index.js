@@ -18,6 +18,12 @@ import Akebiao from "@/views/Akebiao"
 import Qiandao from '@/views/Qiandao'
 import QiandaoPanel from "@/views/QiandaoPanel"
 import Qingjia from "@/views/Qingjia"
+import Tqingjia from "@/views/Tqingjia"
+import QingjiaList from "@/views/QingjiaList"
+import QingjiaPanel from "@/views/QingjiaPanel"
+import QrScan from "@/views/QrScan"
+import Baogao from "@/views/Baogao"
+import TQrCode from "@/views/TQrCode"
 
 Vue.use(Router)
 
@@ -78,6 +84,10 @@ export default new Router({
       }
     },
     { path:'/std/qingjia', name:"Qingjia", component:Qingjia },
+    { path:'/std/qingjiaList', name:"QingjiaList", component:QingjiaList },
+    { path:'/std/qingjiaPanel', name:"QingjiaPanel", component: QingjiaPanel},
+    { path:'/std/qrScan', name:"QrScan", component:QrScan },
+    { path:'/std/baogao', name:"Baogao", component:Baogao },
     {
       path:'/tHome',
       name:"THome",
@@ -89,7 +99,9 @@ export default new Router({
           path:'/tHome/tMine',
           name:'TMine',
           component:TMine
-        }
+        },
+        { path:'/tHome/tqingjia', name:'Tqingjia', component:Tqingjia },
+        { path:'/tHome/tQrCode', name:'TQrCode', component:TQrCode },
       ]
     },
     {

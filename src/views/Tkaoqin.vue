@@ -16,6 +16,10 @@
       prop="banji">
     </el-table-column>
     <el-table-column
+      label="状态"
+      prop="zhuangtai">
+    </el-table-column>
+    <el-table-column
       align="right">
       <template slot="header" slot-scope="scope">
         <el-input
@@ -108,16 +112,32 @@
   :visible.sync="dialogVisible3"
   width="30%"
   :before-close="handleQiandaoClose">
-  <span>这是一段信息</span>
+        <vue-qr :logo-src="logoSrc"
+        :size="191"
+        :margin="0"
+        :auto-color="true"
+        :dot-scale="1"
+        :text="appSrc"
+        v-show="showQr" />
+
   <span slot="footer" class="dialog-footer">
-    
+    <el-button
+    size="mini"
+    @click="handleButton">按钮签到</el-button>
+  <el-button
+    size="mini"
+    type="primary"
+    @click="handleQrCode">二维码签到</el-button>
   </span>
 </el-dialog>
+
+
 </div>
     
 </template>
 
 <script>
+import VueQr from 'vue-qr';
 import * as timeTool from '../utils/timeTool.js'
 
 export default {
@@ -132,8 +152,14 @@ export default {
         dialogbanjinum:null,
         dialogkechengname:null,
         dialogriqi:null,
+        logoSrc:"",
+        appSrc: "",
+        showQr: false
       }
     },
+    components: {
+      VueQr,
+    }, 
     methods: {
       handleEdit(index, row) {
         console.log(index, row);
@@ -161,25 +187,36 @@ export default {
       handleDelete(index, row) {
         console.log(index, row);
 
+        this.dialogbanjinum = row.banjinum
+        this.dialogkechengname = row.kechengname,
+        this.dialogriqi = row.shangketime.split(" ")[0]
+
         if(row.kechenglock === 1){
-          dialogVisible3 = true
+          this.dialogVisible3 = true
         }
         
-        this.$axios.post("/api/kaoqinlog/teacher/update/kechenglock", {
-          banjinum: row.banjinum,
-          kechengname: row.kechengname,
-          riqi: row.shangketime.split(" ")[0],
-          kechenglock: row.kechenglock === 1 ? 0 : 1
-        }).then(res => {
-          console.log(res)
+        if(row.kechenglock === 0){
+            this.$axios.post("/api/kaoqinlog/teacher/update/kechenglock", {
+            banjinum: row.banjinum,
+            kechengname: row.kechengname,
+            riqi: row.shangketime.split(" ")[0],
+            kechenglock: 1
+          }).then(res => {
+            console.log(res)
 
-          //重新渲染
-          this.getTeacherList()
-        }).catch(err => {
-          console.log(err)
-        })
+            //重新渲染
+            this.getTeacherList()
+
+            this.showQr = false
+          }).catch(err => {
+            console.log(err)
+          })
+
+        }
+        
       },
       handleClose(done) {
+        this.tableData2 = [];
         this.dialogbanjinum = null
         this.dialogkechengname = null
         this.dialogriqi = null
@@ -223,10 +260,86 @@ export default {
         })
 
       },
+      handleButton(){
+        //解锁签到
+          this.$axios.post("/api/kaoqinlog/teacher/update/kechenglock", {
+            banjinum: this.dialogbanjinum,
+            kechengname: this.dialogkechengname,
+            riqi: this.dialogriqi,
+            kechenglock: 0
+          }).then(res => {
+            console.log(res)
+
+            //重新渲染
+            this.getTeacherList()
+
+            //修改签到类型
+            this.$axios.post("/api/kaoqinlog/teacher/update/qiandaotype", {
+              banjinum: this.dialogbanjinum,
+              kechengname: this.dialogkechengname,
+              riqi: this.dialogriqi,
+              qiandaotype: 0
+            }).then(res => {
+              console.log(res)
+              if(res.data.success === true){
+                this.$message('修改成功')
+                this.showQr = false
+              }else{
+                this.$message('修改失败')
+              }
+            }).catch(err => {
+              console.log(err)
+              this.$message('服务器异常')
+            })
+          }).catch(err => {
+            console.log(err)
+          })
+
+
+      },
+      handleQrCode(){
+          this.$axios.post("/api/kaoqinlog/teacher/update/kechenglock", {
+            banjinum: this.dialogbanjinum,
+            kechengname: this.dialogkechengname,
+            riqi: this.dialogriqi,
+            kechenglock: 0
+          }).then(res => {
+            console.log(res)
+
+            //重新渲染
+            this.getTeacherList()
+
+            //修改签到类型
+            this.$axios.post("/api/kaoqinlog/teacher/update/qiandaotype", {
+              banjinum: this.dialogbanjinum,
+              kechengname: this.dialogkechengname,
+              riqi: this.dialogriqi,
+              qiandaotype: 1
+            }).then(res => {
+              console.log(res)
+              if(res.data.success === true){
+                this.$message('修改成功')
+
+                this.showQr = true
+                this.appSrc = this.dialogkechengname
+              }else{
+                this.$message('修改失败')
+              }
+            }).catch(err => {
+              console.log(err)
+              this.$message('服务器异常')
+            })
+          }).catch(err => {
+            console.log(err)
+          })
+      },
       handleTixin(index, row){
         console.log(index, row);
       },
       handleQiandaoClose(done){
+        this.dialogbanjinum = null
+        this.dialogkechengname = null
+        this.dialogriqi = null
         done()
       },
       getTeacherList(){
@@ -237,8 +350,8 @@ export default {
             this.tableData.forEach(element => {
                 var shangketimetemp = timeTool.parseDateStr(element.shangketime) 
                 if(element.kechengname1 != null){
-                  var start = shangketimetemp
-                  var end = shangketimetemp
+                  var start = timeTool.parseDateStr(element.shangketime) 
+                  var end = timeTool.parseDateStr(element.shangketime) 
                   start.setHours(8)
                   start.setMinutes(0)
                   start.setSeconds(0)
@@ -265,8 +378,8 @@ export default {
                   element.kechengname = element.kechengname1
                 }
                 if(element.kechengname2 != null){
-                  var start = shangketimetemp
-                  var end = shangketimetemp
+                  var start = timeTool.parseDateStr(element.shangketime) 
+                  var end = timeTool.parseDateStr(element.shangketime) 
                   start.setHours(10)
                   start.setMinutes(10)
                   start.setSeconds(0)
@@ -292,8 +405,8 @@ export default {
                   element.kechengname = element.kechengname2
                 }
                 if(element.kechengname3 != null){
-                                    var start = shangketimetemp
-                  var end = shangketimetemp
+                                    var start = timeTool.parseDateStr(element.shangketime) 
+                  var end = timeTool.parseDateStr(element.shangketime) 
                   start.setHours(14)
                   start.setMinutes(30)
                   start.setSeconds(0)
@@ -317,8 +430,8 @@ export default {
                   element.kechengname = element.kechengname3
                 }
                 if(element.kechengname4 != null){
-                                    var start = shangketimetemp
-                  var end = shangketimetemp
+                                    var start = timeTool.parseDateStr(element.shangketime) 
+                  var end = timeTool.parseDateStr(element.shangketime) 
                   start.setHours(16)
                   start.setMinutes(30)
                   start.setSeconds(0)
@@ -342,8 +455,8 @@ export default {
                   element.kechengname = element.kechengname4
                 }
                 if(element.kechengname5 != null){
-                                    var start = shangketimetemp
-                  var end = shangketimetemp
+                  var start = timeTool.parseDateStr(element.shangketime) 
+                  var end = timeTool.parseDateStr(element.shangketime) 
                   start.setHours(19)
                   start.setMinutes(0)
                   start.setSeconds(0)
@@ -367,8 +480,8 @@ export default {
                   element.kechengname = element.kechengname5
                 }
                 if(element.kechengname6 != null){
-                  var start = shangketimetemp
-                  var end = shangketimetemp
+                  var start = timeTool.parseDateStr(element.shangketime) 
+                  var end = timeTool.parseDateStr(element.shangketime) 
                   start.setHours(20)
                   start.setMinutes(0)
                   start.setSeconds(0)

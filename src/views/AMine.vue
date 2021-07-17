@@ -29,7 +29,7 @@ export default {
     methods: {
         handleYes(){
             this.dialogVisible = false
-            this.$store.state.webSocket.close()
+            // this.$store.state.webSocket.close()
             this.$store.commit('$_removeStorage');    // 清除登录信息
             this.$store.commit('$_removeUser')
             this.$router.push({

@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <el-button type="infor" @click="$router.push({name:'Tkaoqin'})">请假审核</el-button>
+        <el-button type="infor" @click="$router.push({name:'Tqingjia'})">请假审核</el-button>
         <el-button type="infor" @click="$router.push({name:'Tkaoqin'})">考勤情况</el-button>
         <el-button type="infor" @click="$router.push({name:'TinterBanji'})">加入班级</el-button>
         <el-button type="danger" @click="dialogVisible = true">退出登录</el-button>
@@ -29,7 +29,7 @@ export default {
     methods: {
         handleYes(){
             this.dialogVisible = false
-            this.$store.state.webSocket.close()
+            // this.$store.state.webSocket.close()
             this.$store.commit('$_removeStorage');    // 清除登录信息
             this.$store.commit('$_removeUser')
             this.$router.push({

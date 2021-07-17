@@ -26,11 +26,15 @@ export default {
         options:[
             {
                 oname: "课程报告",
-                push:""
+                push:"/std/baogao"
             },
             {
                 oname: "学生请假",
                 push:"/std/qingjia"
+            },
+            {
+                oname: "请假信息",
+                push:"/std/qingjiaList"
             },
             {
                 oname: "选择班级",
@@ -46,7 +50,7 @@ export default {
         message: '确认退出登录？'
         }).then(() => {
         // on confirm
-        this.$store.state.webSocket.close()
+        // this.$store.state.webSocket.close()
         this.$store.commit('$_removeStorage');    // 清除登录信息
         this.$store.commit('$_removeUser')
 	     this.$router.push({

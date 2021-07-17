@@ -7,6 +7,7 @@
     <van-cell-group>
         <van-cell title="开始时间" :value="start" @click="handleClickStart" />
         <van-cell title="结束时间" :value="end" @click="handleClickStart2" />
+        <van-field v-model="teacher" placeholder="请输入教师名" label="教师名" />
         <!-- 输入任意文本 -->
         <van-field 
         v-model="text" 
@@ -66,7 +67,8 @@ export default {
       startDate: null,
       endDate: null,
       end: null,
-      text: null
+      text: null,
+      teacher: null
     };
   },
   components: {
@@ -113,7 +115,8 @@ export default {
               codenum: this.$store.state.user.codenum,
               qjtime1: this.start,
               qjtime2: this.end,
-              qingjiacontent: this.text
+              qingjiacontent: this.text,
+              username: this.teacher
           }).then(res => {
               console.log(res)
               if(res.data.success === true){
